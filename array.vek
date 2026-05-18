@@ -5,6 +5,47 @@ builtin Array<T> {
     return self.len == 0;
   }
 
+  inline fn first(self) -> T? {
+    if self.len == 0 {
+      return null;
+    }
+    return self[0];
+  }
+
+  inline fn last(self) -> T? {
+    if self.len == 0 {
+      return null;
+    }
+    return self[self.len - 1];
+  }
+
+  fn contains(self, value: T) -> bool where T: Equal<T> {
+    for elem in self {
+      if elem.equals(value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  fn any(self, f: fn(T) -> bool) -> bool {
+    for elem in self {
+      if f(elem) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  fn all(self, f: fn(T) -> bool) -> bool {
+    for elem in self {
+      if !f(elem) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   satisfies Index<usize, T> {
     fn index_get(self, index: usize) -> T;
   }
