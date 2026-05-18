@@ -1,7 +1,7 @@
 builtin Array<T> {
   fn len(self) -> usize;
 
-  fn is_empty(self) -> bool {
+  inline fn is_empty(self) -> bool {
     return self.len == 0;
   }
 
@@ -24,7 +24,7 @@ builtin Array<T> {
   }
 
   satisfies Default {
-    fn default() -> Self {
+    inline fn default() -> Self {
       return [];
     }
   }

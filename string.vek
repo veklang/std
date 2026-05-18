@@ -3,7 +3,7 @@ builtin string {
   fn to_cstr(self) -> cstr;
   unsafe fn from_cstr(source: cstr) -> string;
 
-  fn is_empty(self) -> bool {
+  inline fn is_empty(self) -> bool {
     return self.len == 0;
   }
 
@@ -24,13 +24,13 @@ builtin string {
   }
 
   satisfies Default {
-    fn default() -> Self {
+    inline fn default() -> Self {
       return "";
     }
   }
 
   satisfies Format {
-    fn format(self) -> string {
+    inline fn format(self) -> string {
       return self.clone();
     }
   }
