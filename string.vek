@@ -1,0 +1,33 @@
+builtin string {
+  fn len(self) -> usize;
+  fn to_cstr(self) -> cstr;
+  unsafe fn from_cstr(source: cstr) -> string;
+
+  satisfies Equal<string> {
+    fn equals(self, other: string) -> bool;
+  }
+
+  satisfies Add<string, string> {
+    fn add(self, rhs: string) -> string;
+  }
+
+  satisfies Index<usize, string> {
+    fn index_get(self, index: usize) -> string;
+  }
+
+  satisfies Clone {
+    fn clone(self) -> string;
+  }
+
+  satisfies Default {
+    fn default() -> Self {
+      return "";
+    }
+  }
+
+  satisfies Format {
+    fn format(self) -> string {
+      return self.clone();
+    }
+  }
+}

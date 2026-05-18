@@ -1,0 +1,79 @@
+builtin Array<T> {
+  fn len(self) -> usize;
+
+  satisfies Index<usize, T> {
+    fn index_get(self, index: usize) -> T;
+  }
+
+  satisfies IndexMut<usize, T> {
+    fn index_set(mut self, index: usize, value: T) -> void;
+  }
+
+  satisfies Iterator {
+    type Item = T;
+
+    fn next(mut self) -> Item?;
+  }
+
+  satisfies Clone where T: Clone {
+    fn clone(self) -> Self;
+  }
+
+  satisfies Default {
+    fn default() -> Self {
+      return [];
+    }
+  }
+
+  satisfies Equal<Array<T>> where T: Equal<T> {
+    fn equals(self, other: Self) -> bool {
+      if self.len != other.len {
+        return false;
+      }
+      let i: usize = 0;
+      while i < self.len {
+        if !self[i].equals(other[i]) {
+          return false;
+        }
+        i = i + 1;
+      }
+      return true;
+    }
+  }
+
+  satisfies Order<Array<T>> where T: Order<T> {
+    fn compare(self, other: Self) -> Ordering {
+      let min_len: usize = if self.len < other.len { self.len } else { other.len };
+      let i: usize = 0;
+      while i < min_len {
+        let ord: Ordering = self[i].compare(other[i]);
+        if ord != Equal {
+          return ord;
+        }
+        i = i + 1;
+      }
+      if self.len < other.len {
+        return Less;
+      }
+      if self.len > other.len {
+        return Greater;
+      }
+      return Equal;
+    }
+  }
+
+  satisfies Format where T: Format {
+    fn format(self) -> string {
+      let acc = "[";
+      let first = true;
+      for elem in self {
+        if !first {
+          acc = acc + ", ";
+        }
+        acc = acc + elem.format();
+        first = false;
+      }
+      return acc + "]";
+    }
+  }
+}
