@@ -46,6 +46,14 @@ builtin Array<T> {
     return true;
   }
 
+  fn fold<Acc>(self, init: Acc, f: fn(Acc, T) -> Acc) -> Acc {
+    let acc: Acc = init;
+    for elem in self {
+      acc = f(acc, elem);
+    }
+    return acc;
+  }
+
   satisfies Index<usize, T> {
     fn index_get(self, index: usize) -> T;
   }

@@ -7,6 +7,62 @@ builtin string {
     return self.len == 0;
   }
 
+  fn starts_with(self, prefix: string) -> bool {
+    if prefix.len > self.len {
+      return false;
+    }
+    let i: usize = 0;
+    while i < prefix.len {
+      if !self[i].equals(prefix[i]) {
+        return false;
+      }
+      i = i + 1;
+    }
+    return true;
+  }
+
+  fn ends_with(self, suffix: string) -> bool {
+    if suffix.len > self.len {
+      return false;
+    }
+    let offset: usize = self.len - suffix.len;
+    let i: usize = 0;
+    while i < suffix.len {
+      if !self[offset + i].equals(suffix[i]) {
+        return false;
+      }
+      i = i + 1;
+    }
+    return true;
+  }
+
+  fn contains(self, needle: string) -> bool {
+    if needle.len > self.len {
+      return false;
+    }
+    if needle.len == 0 {
+      return true;
+    }
+    let limit: usize = self.len - needle.len + 1;
+    let i: usize = 0;
+    while i < limit {
+      let j: usize = 0;
+      let matched: bool = true;
+      while j < needle.len {
+        if !self[i + j].equals(needle[j]) {
+          matched = false;
+          break;
+        }
+        j = j + 1;
+      }
+      if matched {
+        return true;
+      }
+      i = i + 1;
+    }
+    return false;
+  }
+
   satisfies Equal<string> {
     fn equals(self, other: string) -> bool;
   }
