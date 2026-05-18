@@ -1,6 +1,10 @@
 builtin Array<T> {
   fn len(self) -> usize;
 
+  fn is_empty(self) -> bool {
+    return self.len == 0;
+  }
+
   satisfies Index<usize, T> {
     fn index_get(self, index: usize) -> T;
   }
