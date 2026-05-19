@@ -1,5 +1,7 @@
 builtin Array<T> {
   fn len(self) -> usize;
+  fn push(mut self, value: T) -> void;
+  fn pop(mut self) -> T?;
 
   inline fn is_empty(self) -> bool {
     return self.len == 0;
