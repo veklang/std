@@ -1,18 +1,17 @@
 builtin string {
-  fn len(self) -> usize;
   fn to_cstr(self) -> cstr;
   unsafe fn from_cstr(source: cstr) -> string;
 
   inline fn is_empty(self) -> bool {
-    return self.len == 0;
+    return self.length() == 0;
   }
 
   fn starts_with(self, prefix: string) -> bool {
-    if prefix.len > self.len {
+    if prefix.length() > self.length() {
       return false;
     }
     let i: usize = 0;
-    while i < prefix.len {
+    while i < prefix.length() {
       if !self[i].equals(prefix[i]) {
         return false;
       }
@@ -22,12 +21,12 @@ builtin string {
   }
 
   fn ends_with(self, suffix: string) -> bool {
-    if suffix.len > self.len {
+    if suffix.length() > self.length() {
       return false;
     }
-    let offset: usize = self.len - suffix.len;
+    let offset: usize = self.length() - suffix.length();
     let i: usize = 0;
-    while i < suffix.len {
+    while i < suffix.length() {
       if !self[offset + i].equals(suffix[i]) {
         return false;
       }
@@ -37,18 +36,18 @@ builtin string {
   }
 
   fn contains(self, needle: string) -> bool {
-    if needle.len > self.len {
+    if needle.length() > self.length() {
       return false;
     }
-    if needle.len == 0 {
+    if needle.length() == 0 {
       return true;
     }
-    let limit: usize = self.len - needle.len + 1;
+    let limit: usize = self.length() - needle.length() + 1;
     let i: usize = 0;
     while i < limit {
       let j: usize = 0;
       let matched: bool = true;
-      while j < needle.len {
+      while j < needle.length() {
         if !self[i + j].equals(needle[j]) {
           matched = false;
           break;
@@ -61,6 +60,10 @@ builtin string {
       i = i + 1;
     }
     return false;
+  }
+
+  satisfies Length {
+    fn length(self) -> usize;
   }
 
   satisfies Equal<string> {

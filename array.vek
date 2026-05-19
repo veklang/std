@@ -1,24 +1,23 @@
 builtin Array<T> {
-  fn len(self) -> usize;
   fn push(mut self, value: T) -> void;
   fn pop(mut self) -> T?;
 
   inline fn is_empty(self) -> bool {
-    return self.len == 0;
+    return self.length() == 0;
   }
 
   inline fn first(self) -> T? {
-    if self.len == 0 {
+    if self.length() == 0 {
       return null;
     }
     return self[0];
   }
 
   inline fn last(self) -> T? {
-    if self.len == 0 {
+    if self.length() == 0 {
       return null;
     }
-    return self[self.len - 1];
+    return self[self.length() - 1];
   }
 
   fn contains(self, value: T) -> bool where T: Equal<T> {
@@ -56,6 +55,10 @@ builtin Array<T> {
     return acc;
   }
 
+  satisfies Length {
+    fn length(self) -> usize;
+  }
+
   satisfies Index<usize, T> {
     fn index_get(self, index: usize) -> T;
   }
@@ -82,11 +85,11 @@ builtin Array<T> {
 
   satisfies Equal<Array<T>> where T: Equal<T> {
     fn equals(self, other: Self) -> bool {
-      if self.len != other.len {
+      if self.length() != other.length() {
         return false;
       }
       let i: usize = 0;
-      while i < self.len {
+      while i < self.length() {
         if !self[i].equals(other[i]) {
           return false;
         }
@@ -98,7 +101,7 @@ builtin Array<T> {
 
   satisfies Order<Array<T>> where T: Order<T> {
     fn compare(self, other: Self) -> Ordering {
-      let min_len: usize = if self.len < other.len { self.len } else { other.len };
+      let min_len: usize = if self.length() < other.length() { self.length() } else { other.length() };
       let i: usize = 0;
       while i < min_len {
         let ord: Ordering = self[i].compare(other[i]);
@@ -107,10 +110,10 @@ builtin Array<T> {
         }
         i = i + 1;
       }
-      if self.len < other.len {
+      if self.length() < other.length() {
         return Less;
       }
-      if self.len > other.len {
+      if self.length() > other.length() {
         return Greater;
       }
       return Equal;
