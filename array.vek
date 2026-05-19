@@ -48,7 +48,7 @@ builtin Array<T> {
   }
 
   fn fold<Acc>(self, init: Acc, f: fn(Acc, T) -> Acc) -> Acc {
-    let acc: Acc = init;
+    let mut acc: Acc = init;
     for elem in self {
       acc = f(acc, elem);
     }
@@ -88,12 +88,12 @@ builtin Array<T> {
       if self.length() != other.length() {
         return false;
       }
-      let i: usize = 0;
+      let mut i: usize = 0;
       while i < self.length() {
         if !self[i].equals(other[i]) {
           return false;
         }
-        i = i + 1;
+        i += 1;
       }
       return true;
     }
@@ -102,13 +102,13 @@ builtin Array<T> {
   satisfies Order<Array<T>> where T: Order<T> {
     fn compare(self, other: Self) -> Ordering {
       let min_len: usize = if self.length() < other.length() { self.length() } else { other.length() };
-      let i: usize = 0;
+      let mut i: usize = 0;
       while i < min_len {
         let ord: Ordering = self[i].compare(other[i]);
         if ord != Equal {
           return ord;
         }
-        i = i + 1;
+        i += 1;
       }
       if self.length() < other.length() {
         return Less;
@@ -122,13 +122,13 @@ builtin Array<T> {
 
   satisfies Format where T: Format {
     fn format(self) -> string {
-      let acc = "[";
-      let first = true;
+      let mut acc = "[";
+      let mut first = true;
       for elem in self {
         if !first {
-          acc = acc + ", ";
+          acc += ", ";
         }
-        acc = acc + elem.format();
+        acc += elem.format();
         first = false;
       }
       return acc + "]";

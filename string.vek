@@ -10,12 +10,12 @@ builtin string {
     if prefix.length() > self.length() {
       return false;
     }
-    let i: usize = 0;
+    let mut i: usize = 0;
     while i < prefix.length() {
       if !self[i].equals(prefix[i]) {
         return false;
       }
-      i = i + 1;
+      i += 1;
     }
     return true;
   }
@@ -25,12 +25,12 @@ builtin string {
       return false;
     }
     let offset: usize = self.length() - suffix.length();
-    let i: usize = 0;
+    let mut i: usize = 0;
     while i < suffix.length() {
       if !self[offset + i].equals(suffix[i]) {
         return false;
       }
-      i = i + 1;
+      i += 1;
     }
     return true;
   }
@@ -43,21 +43,21 @@ builtin string {
       return true;
     }
     let limit: usize = self.length() - needle.length() + 1;
-    let i: usize = 0;
+    let mut i: usize = 0;
     while i < limit {
-      let j: usize = 0;
-      let matched: bool = true;
+      let mut j: usize = 0;
+      let mut matched: bool = true;
       while j < needle.length() {
         if !self[i + j].equals(needle[j]) {
           matched = false;
           break;
         }
-        j = j + 1;
+        j += 1;
       }
       if matched {
         return true;
       }
-      i = i + 1;
+      i += 1;
     }
     return false;
   }
