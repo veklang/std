@@ -55,6 +55,24 @@ builtin Array<T> {
     return acc;
   }
 
+  fn map<U>(self, f: fn(T) -> U) -> Array<U> {
+    let mut result: Array<U> = [];
+    for elem in self {
+      result.push(f(elem));
+    }
+    return result;
+  }
+
+  fn filter(self, f: fn(T) -> bool) -> Array<T> {
+    let mut result: Array<T> = [];
+    for elem in self {
+      if f(elem) {
+        result.push(elem);
+      }
+    }
+    return result;
+  }
+
   satisfies Length {
     fn length(self) -> usize;
   }
