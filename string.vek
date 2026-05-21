@@ -1,12 +1,12 @@
 builtin string {
-  fn to_cstr(self) -> cstr;
-  unsafe fn from_cstr(source: cstr) -> string;
+  pub fn to_cstr(self) -> cstr;
+  pub unsafe fn from_cstr(source: cstr) -> string;
 
-  inline fn is_empty(self) -> bool {
+  pub inline fn is_empty(self) -> bool {
     return self.length() == 0;
   }
 
-  fn starts_with(self, prefix: string) -> bool {
+  pub fn starts_with(self, prefix: string) -> bool {
     if prefix.length() > self.length() {
       return false;
     }
@@ -20,7 +20,7 @@ builtin string {
     return true;
   }
 
-  fn ends_with(self, suffix: string) -> bool {
+  pub fn ends_with(self, suffix: string) -> bool {
     if suffix.length() > self.length() {
       return false;
     }
@@ -35,7 +35,7 @@ builtin string {
     return true;
   }
 
-  fn contains(self, needle: string) -> bool {
+  pub fn contains(self, needle: string) -> bool {
     if needle.length() > self.length() {
       return false;
     }

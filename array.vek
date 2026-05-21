@@ -1,26 +1,26 @@
 builtin Array<T> {
-  fn push(mut self, value: T) -> void;
-  fn pop(mut self) -> T?;
+  pub fn push(mut self, value: T) -> void;
+  pub fn pop(mut self) -> T?;
 
-  inline fn is_empty(self) -> bool {
+  pub inline fn is_empty(self) -> bool {
     return self.length() == 0;
   }
 
-  inline fn first(self) -> T? {
+  pub inline fn first(self) -> T? {
     if self.length() == 0 {
       return null;
     }
     return self[0];
   }
 
-  inline fn last(self) -> T? {
+  pub inline fn last(self) -> T? {
     if self.length() == 0 {
       return null;
     }
     return self[self.length() - 1];
   }
 
-  fn contains(self, value: T) -> bool where T: Equal<T> {
+  pub fn contains(self, value: T) -> bool where T: Equal<T> {
     for elem in self {
       if elem.equals(value) {
         return true;
@@ -29,7 +29,7 @@ builtin Array<T> {
     return false;
   }
 
-  fn any(self, f: fn(T) -> bool) -> bool {
+  pub fn any(self, f: fn(T) -> bool) -> bool {
     for elem in self {
       if f(elem) {
         return true;
@@ -38,7 +38,7 @@ builtin Array<T> {
     return false;
   }
 
-  fn all(self, f: fn(T) -> bool) -> bool {
+  pub fn all(self, f: fn(T) -> bool) -> bool {
     for elem in self {
       if !f(elem) {
         return false;
@@ -47,7 +47,7 @@ builtin Array<T> {
     return true;
   }
 
-  fn fold<Acc>(self, init: Acc, f: fn(Acc, T) -> Acc) -> Acc {
+  pub fn fold<Acc>(self, init: Acc, f: fn(Acc, T) -> Acc) -> Acc {
     let mut acc: Acc = init;
     for elem in self {
       acc = f(acc, elem);
@@ -55,7 +55,7 @@ builtin Array<T> {
     return acc;
   }
 
-  fn map<U>(self, f: fn(T) -> U) -> Array<U> {
+  pub fn map<U>(self, f: fn(T) -> U) -> Array<U> {
     let mut result: Array<U> = [];
     for elem in self {
       result.push(f(elem));
@@ -63,7 +63,7 @@ builtin Array<T> {
     return result;
   }
 
-  fn filter(self, f: fn(T) -> bool) -> Array<T> {
+  pub fn filter(self, f: fn(T) -> bool) -> Array<T> {
     let mut result: Array<T> = [];
     for elem in self {
       if f(elem) {
