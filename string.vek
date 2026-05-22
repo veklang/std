@@ -168,6 +168,10 @@ builtin string {
     fn equals(self, other: string) -> bool;
   }
 
+  satisfies Order<string> {
+    fn compare(self, other: string) -> Ordering;
+  }
+
   satisfies Add<string, string> {
     fn add(self, rhs: string) -> string;
   }
