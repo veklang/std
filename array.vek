@@ -73,6 +73,129 @@ builtin Array<T> {
     return result;
   }
 
+  pub fn sort(mut self) -> void where T: Order<T> {
+    let len: usize = self.length();
+    if len < 2 {
+      return;
+    }
+    let mut max_depth: u32 = 0;
+    let mut x: usize = len;
+    while x > 1 {
+      x = x / 2;
+      max_depth += 1;
+    }
+    max_depth = max_depth * 2;
+    self.introsort_range(0, len, max_depth);
+  }
+
+  fn introsort_range(mut self, lo: usize, hi: usize, depth: u32) -> void where T: Order<T> {
+    let mut l: usize = lo;
+    let mut h: usize = hi;
+    let mut d: u32 = depth;
+    while h - l > 16 {
+      if d == 0 {
+        self.heapsort_range(l, h);
+        return;
+      }
+      let p: usize = self.partition_range(l, h);
+      if p - l < h - p {
+        self.introsort_range(l, p, d - 1);
+        l = p + 1;
+      } else {
+        self.introsort_range(p + 1, h, d - 1);
+        h = p;
+      }
+      d -= 1;
+    }
+    self.insertion_sort_range(l, h);
+  }
+
+  fn insertion_sort_range(mut self, lo: usize, hi: usize) -> void where T: Order<T> {
+    let mut i: usize = lo + 1;
+    while i < hi {
+      let mut j: usize = i;
+      while j > lo && self[j - 1].compare(self[j]) == Greater {
+        let tmp = self[j - 1];
+        self[j - 1] = self[j];
+        self[j] = tmp;
+        j -= 1;
+      }
+      i += 1;
+    }
+  }
+
+  fn partition_range(mut self, lo: usize, hi: usize) -> usize where T: Order<T> {
+    let mid: usize = lo + (hi - lo) / 2;
+    let last: usize = hi - 1;
+    if self[mid].compare(self[lo]) == Less {
+      let tmp = self[lo];
+      self[lo] = self[mid];
+      self[mid] = tmp;
+    }
+    if self[last].compare(self[lo]) == Less {
+      let tmp = self[lo];
+      self[lo] = self[last];
+      self[last] = tmp;
+    }
+    if self[mid].compare(self[last]) == Less {
+      let tmp = self[mid];
+      self[mid] = self[last];
+      self[last] = tmp;
+    }
+    let mut i: usize = lo;
+    let mut j: usize = lo;
+    while j < last {
+      if self[j].compare(self[last]) != Greater {
+        let tmp = self[i];
+        self[i] = self[j];
+        self[j] = tmp;
+        i += 1;
+      }
+      j += 1;
+    }
+    let tmp = self[i];
+    self[i] = self[last];
+    self[last] = tmp;
+    return i;
+  }
+
+  fn heapsort_range(mut self, lo: usize, hi: usize) -> void where T: Order<T> {
+    let n: usize = hi - lo;
+    if n < 2 {
+      return;
+    }
+    let mut i: usize = n / 2;
+    while i > 0 {
+      i -= 1;
+      self.sift_down(lo, i, n);
+    }
+    let mut end: usize = n;
+    while end > 1 {
+      end -= 1;
+      let tmp = self[lo];
+      self[lo] = self[lo + end];
+      self[lo + end] = tmp;
+      self.sift_down(lo, 0, end);
+    }
+  }
+
+  fn sift_down(mut self, lo: usize, root: usize, n: usize) -> void where T: Order<T> {
+    let mut r: usize = root;
+    while r * 2 + 1 < n {
+      let mut child: usize = r * 2 + 1;
+      if child + 1 < n && self[lo + child].compare(self[lo + child + 1]) == Less {
+        child += 1;
+      }
+      if self[lo + r].compare(self[lo + child]) != Less {
+        return;
+      }
+      let tmp = self[lo + r];
+      self[lo + r] = self[lo + child];
+      self[lo + child] = tmp;
+      r = child;
+    }
+  }
+
   satisfies Length {
     fn length(self) -> usize;
   }
