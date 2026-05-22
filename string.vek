@@ -62,6 +62,104 @@ builtin string {
     return false;
   }
 
+  pub fn count(self, needle: string) -> usize {
+    if needle.length() == 0 {
+      return 0;
+    }
+    if needle.length() > self.length() {
+      return 0;
+    }
+    let limit: usize = self.length() - needle.length() + 1;
+    let mut count: usize = 0;
+    let mut i: usize = 0;
+    while i < limit {
+      let mut j: usize = 0;
+      let mut matched: bool = true;
+      while j < needle.length() {
+        if !self[i + j].equals(needle[j]) {
+          matched = false;
+          break;
+        }
+        j += 1;
+      }
+      if matched {
+        count += 1;
+        i += needle.length();
+      } else {
+        i += 1;
+      }
+    }
+    return count;
+  }
+
+  pub fn find(self, needle: string) -> usize? {
+    if needle.length() == 0 {
+      return 0;
+    }
+    if needle.length() > self.length() {
+      return null;
+    }
+    let limit: usize = self.length() - needle.length() + 1;
+    let mut i: usize = 0;
+    while i < limit {
+      let mut j: usize = 0;
+      let mut matched: bool = true;
+      while j < needle.length() {
+        if !self[i + j].equals(needle[j]) {
+          matched = false;
+          break;
+        }
+        j += 1;
+      }
+      if matched {
+        return i;
+      }
+      i += 1;
+    }
+    return null;
+  }
+
+  pub fn replace(mut self, needle: string, replacement: string, amount: usize? = null) -> usize {
+    if needle.length() == 0 {
+      return 0;
+    }
+    if needle.length() > self.length() {
+      return 0;
+    }
+    if amount != null && amount == 0 {
+      return 0;
+    }
+    let len: usize = self.length();
+    let needle_len: usize = needle.length();
+    let mut result: string = "";
+    let mut count: usize = 0;
+    let mut i: usize = 0;
+    while i < len {
+      let mut matched: bool = false;
+      if i + needle_len <= len && (amount == null || count < amount) {
+        let mut j: usize = 0;
+        matched = true;
+        while j < needle_len {
+          if !self[i + j].equals(needle[j]) {
+            matched = false;
+            break;
+          }
+          j += 1;
+        }
+      }
+      if matched {
+        result += replacement;
+        count += 1;
+        i += needle_len;
+      } else {
+        result += self[i];
+        i += 1;
+      }
+    }
+    self = result;
+    return count;
+  }
+
   satisfies Length {
     fn length(self) -> usize;
   }
