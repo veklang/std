@@ -172,6 +172,10 @@ builtin string {
     fn compare(self, other: string) -> Ordering;
   }
 
+  satisfies Hash {
+    fn hash(self) -> u64;
+  }
+
   satisfies Add<string, string> {
     fn add(self, rhs: string) -> string;
   }
