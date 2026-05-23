@@ -1,26 +1,26 @@
 unsafe extern fn __vek_io_write_stdout_cstr(message: cstr) -> void;
 unsafe extern fn __vek_io_write_stderr_cstr(message: cstr) -> void;
 
-pub fn print(message: string) -> void {
+pub inline fn print(message: string) -> void {
   unsafe {
     __vek_io_write_stdout_cstr(message.to_cstr());
   }
 }
 
-pub fn println(message: string) -> void {
+pub inline fn println(message: string) -> void {
   unsafe {
     __vek_io_write_stdout_cstr(message.to_cstr());
     __vek_io_write_stdout_cstr("\n".to_cstr());
   }
 }
 
-pub fn eprint(message: string) -> void {
+pub inline fn eprint(message: string) -> void {
   unsafe {
     __vek_io_write_stderr_cstr(message.to_cstr());
   }
 }
 
-pub fn eprintln(message: string) -> void {
+pub inline fn eprintln(message: string) -> void {
   unsafe {
     __vek_io_write_stderr_cstr(message.to_cstr());
     __vek_io_write_stderr_cstr("\n".to_cstr());
