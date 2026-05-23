@@ -5,7 +5,6 @@ unsafe extern fn __vek_math_floor(x: f64) -> f64;
 unsafe extern fn __vek_math_ceil(x: f64) -> f64;
 unsafe extern fn __vek_math_trunc(x: f64) -> f64;
 unsafe extern fn __vek_math_round(x: f64) -> f64;
-unsafe extern fn __vek_math_pow(b: f64, e: f64) -> f64;
 unsafe extern fn __vek_math_exp(x: f64) -> f64;
 unsafe extern fn __vek_math_exp2(x: f64) -> f64;
 unsafe extern fn __vek_math_log(x: f64) -> f64;
@@ -60,7 +59,6 @@ pub inline fn floor(x: f64) -> f64 { return unsafe { __vek_math_floor(x) }; }
 pub inline fn ceil(x: f64) -> f64 { return unsafe { __vek_math_ceil(x) }; }
 pub inline fn trunc(x: f64) -> f64 { return unsafe { __vek_math_trunc(x) }; }
 pub inline fn round(x: f64) -> f64 { return unsafe { __vek_math_round(x) }; }
-pub inline fn pow(base: f64, exponent: f64) -> f64 { return unsafe { __vek_math_pow(base, exponent) }; }
 pub inline fn exp(x: f64) -> f64 { return unsafe { __vek_math_exp(x) }; }
 pub inline fn exp2(x: f64) -> f64 { return unsafe { __vek_math_exp2(x) }; }
 pub inline fn log(x: f64) -> f64 { return unsafe { __vek_math_log(x) }; }
