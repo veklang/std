@@ -29,21 +29,21 @@ pub const SQRT_2: f64 = 1.4142135623730951;
 pub const LN_2: f64 = 0.6931471805599453;
 pub const LN_10: f64 = 2.302585092994046;
 
-pub fn min<T: Order<T>>(a: T, b: T) -> T {
+pub inline fn min<T: Order<T>>(a: T, b: T) -> T {
   if a.compare(b) == Less {
     return a;
   }
   return b;
 }
 
-pub fn max<T: Order<T>>(a: T, b: T) -> T {
+pub inline fn max<T: Order<T>>(a: T, b: T) -> T {
   if a.compare(b) == Greater {
     return a;
   }
   return b;
 }
 
-pub fn clamp<T: Order<T>>(x: T, lo: T, hi: T) -> T {
+pub inline fn clamp<T: Order<T>>(x: T, lo: T, hi: T) -> T {
   if x.compare(lo) == Less {
     return lo;
   }
@@ -53,117 +53,26 @@ pub fn clamp<T: Order<T>>(x: T, lo: T, hi: T) -> T {
   return x;
 }
 
-pub fn abs(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_fabs(x) };
-  return r;
-}
-
-pub fn sqrt(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_sqrt(x) };
-  return r;
-}
-
-pub fn cbrt(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_cbrt(x) };
-  return r;
-}
-
-pub fn floor(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_floor(x) };
-  return r;
-}
-
-pub fn ceil(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_ceil(x) };
-  return r;
-}
-
-pub fn trunc(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_trunc(x) };
-  return r;
-}
-
-pub fn round(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_round(x) };
-  return r;
-}
-
-pub fn pow(base: f64, exponent: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_pow(base, exponent) };
-  return r;
-}
-
-pub fn exp(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_exp(x) };
-  return r;
-}
-
-pub fn exp2(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_exp2(x) };
-  return r;
-}
-
-pub fn log(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_log(x) };
-  return r;
-}
-
-pub fn log2(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_log2(x) };
-  return r;
-}
-
-pub fn log10(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_log10(x) };
-  return r;
-}
-
-pub fn sin(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_sin(x) };
-  return r;
-}
-
-pub fn cos(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_cos(x) };
-  return r;
-}
-
-pub fn tan(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_tan(x) };
-  return r;
-}
-
-pub fn asin(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_asin(x) };
-  return r;
-}
-
-pub fn acos(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_acos(x) };
-  return r;
-}
-
-pub fn atan(x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_atan(x) };
-  return r;
-}
-
-pub fn atan2(y: f64, x: f64) -> f64 {
-  let r: f64 = unsafe { __vek_math_atan2(y, x) };
-  return r;
-}
-
-pub fn is_nan(x: f64) -> bool {
-  let r: bool = unsafe { __vek_math_is_nan(x) };
-  return r;
-}
-
-pub fn is_finite(x: f64) -> bool {
-  let r: bool = unsafe { __vek_math_is_finite(x) };
-  return r;
-}
-
-pub fn is_infinite(x: f64) -> bool {
-  let r: bool = unsafe { __vek_math_is_infinite(x) };
-  return r;
-}
+pub inline fn abs(x: f64) -> f64 { return unsafe { __vek_math_fabs(x) }; }
+pub inline fn sqrt(x: f64) -> f64 { return unsafe { __vek_math_sqrt(x) }; }
+pub inline fn cbrt(x: f64) -> f64 { return unsafe { __vek_math_cbrt(x) }; }
+pub inline fn floor(x: f64) -> f64 { return unsafe { __vek_math_floor(x) }; }
+pub inline fn ceil(x: f64) -> f64 { return unsafe { __vek_math_ceil(x) }; }
+pub inline fn trunc(x: f64) -> f64 { return unsafe { __vek_math_trunc(x) }; }
+pub inline fn round(x: f64) -> f64 { return unsafe { __vek_math_round(x) }; }
+pub inline fn pow(base: f64, exponent: f64) -> f64 { return unsafe { __vek_math_pow(base, exponent) }; }
+pub inline fn exp(x: f64) -> f64 { return unsafe { __vek_math_exp(x) }; }
+pub inline fn exp2(x: f64) -> f64 { return unsafe { __vek_math_exp2(x) }; }
+pub inline fn log(x: f64) -> f64 { return unsafe { __vek_math_log(x) }; }
+pub inline fn log2(x: f64) -> f64 { return unsafe { __vek_math_log2(x) }; }
+pub inline fn log10(x: f64) -> f64 { return unsafe { __vek_math_log10(x) }; }
+pub inline fn sin(x: f64) -> f64 { return unsafe { __vek_math_sin(x) }; }
+pub inline fn cos(x: f64) -> f64 { return unsafe { __vek_math_cos(x) }; }
+pub inline fn tan(x: f64) -> f64 { return unsafe { __vek_math_tan(x) }; }
+pub inline fn asin(x: f64) -> f64 { return unsafe { __vek_math_asin(x) }; }
+pub inline fn acos(x: f64) -> f64 { return unsafe { __vek_math_acos(x) }; }
+pub inline fn atan(x: f64) -> f64 { return unsafe { __vek_math_atan(x) }; }
+pub inline fn atan2(y: f64, x: f64) -> f64 { return unsafe { __vek_math_atan2(y, x) }; }
+pub inline fn is_nan(x: f64) -> bool { return unsafe { __vek_math_is_nan(x) }; }
+pub inline fn is_finite(x: f64) -> bool { return unsafe { __vek_math_is_finite(x) }; }
+pub inline fn is_infinite(x: f64) -> bool { return unsafe { __vek_math_is_infinite(x) }; }
