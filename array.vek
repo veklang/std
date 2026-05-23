@@ -29,6 +29,18 @@ builtin Array<T> {
     return false;
   }
 
+  pub fn find(self, value: T) -> usize? where T: Equal<T> {
+    let len: usize = self.length();
+    let mut i: usize = 0;
+    while i < len {
+      if self[i].equals(value) {
+        return i;
+      }
+      i += 1;
+    }
+    return null;
+  }
+
   pub fn any(self, f: fn(T) -> bool) -> bool {
     for elem in self {
       if f(elem) {
