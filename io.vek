@@ -1,3 +1,5 @@
+extern "io.c";
+
 unsafe extern fn __vek_io_write_stdout_cstr(message: cstr) -> void;
 unsafe extern fn __vek_io_write_stderr_cstr(message: cstr) -> void;
 
