@@ -54,9 +54,7 @@ VEK_NORETURN void __vek_env_abort(void) { abort(); }
  * those globals — it does not own argc/argv. The Vek side builds the string[]. */
 size_t __vek_env_argc(void) { return (size_t)(__vek_argc < 0 ? 0 : __vek_argc); }
 
-__vek_string *__vek_env_arg(size_t index) {
-  return __vek_string_from_cstr(__vek_argv[index]);
-}
+__vek_string *__vek_env_arg(size_t index) { return __vek_string_from_cstr(__vek_argv[index]); }
 
 /* Environment snapshot. `environ` is a NULL-terminated "KEY=VALUE" array; the
  * Vek side asks for the count, then the key and value of each entry. Splitting
@@ -86,13 +84,9 @@ __vek_string *__vek_env_pair_value(size_t index) {
 
 /* Working directory change. Returns 0 on success or the errno on failure; the
  * Vek side turns a non-zero code into Err(strerror(code)). */
-int32_t __vek_env_chdir(const char *path) {
-  return chdir(path) == 0 ? 0 : errno;
-}
+int32_t __vek_env_chdir(const char *path) { return chdir(path) == 0 ? 0 : errno; }
 
-__vek_string *__vek_env_strerror(int32_t code) {
-  return __vek_string_from_cstr(strerror(code));
-}
+__vek_string *__vek_env_strerror(int32_t code) { return __vek_string_from_cstr(strerror(code)); }
 
 __vek_string *__vek_env_cwd(void) {
   /* Start at 4096 and grow on ERANGE. POSIX doesn't bound pathname length
