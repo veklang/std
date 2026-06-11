@@ -1,0 +1,194 @@
+// std:path — purely textual path manipulation; never touches the filesystem.
+//
+// POSIX semantics: the path separator is `/`, and output paths use `/`. The
+// spec's Windows clauses (drive letters, `\` separators, UNC prefixes) are not
+// implemented in this version — the rest of the toolchain is POSIX-only, so a
+// Windows path layer here could never be exercised. They are a clean extension
+// when a Windows target exists.
+
+// Scalar position of the last `/` in `s`, or null when there is none.
+fn last_separator(s: string) -> usize? {
+  let len: usize = s.length();
+  let mut found: usize? = null;
+  let mut i: usize = 0;
+  while i < len {
+    if s[i] == "/" {
+      found = i;
+    }
+    i += 1;
+  }
+  return found;
+}
+
+// Scalar position of the last `.` in `s`, or null when there is none.
+fn last_dot(s: string) -> usize? {
+  let len: usize = s.length();
+  let mut found: usize? = null;
+  let mut i: usize = 0;
+  while i < len {
+    if s[i] == "." {
+      found = i;
+    }
+    i += 1;
+  }
+  return found;
+}
+
+pub fn is_absolute(path: string) -> bool {
+  return path.length() > 0 && path[0] == "/";
+}
+
+pub fn is_relative(path: string) -> bool {
+  return !is_absolute(path);
+}
+
+pub fn join(base: string, relative: string) -> string {
+  if is_absolute(relative) {
+    return relative;
+  }
+  if base.length() == 0 {
+    return relative;
+  }
+  if relative.length() == 0 {
+    return base;
+  }
+  // Collapse the join-point separator: only the base's trailing `/` can be
+  // redundant, since an absolute `relative` already returned above.
+  if base[base.length() - 1] == "/" {
+    return base + relative;
+  }
+  return base + "/" + relative;
+}
+
+pub fn file_name(path: string) -> string? {
+  let len: usize = path.length();
+  if len == 0 {
+    return null;
+  }
+  // A trailing separator (which includes the root "/") has no final component.
+  if path[len - 1] == "/" {
+    return null;
+  }
+  let sep: usize? = last_separator(path);
+  if sep == null {
+    return path;
+  }
+  return path.slice(sep! + 1, len);
+}
+
+pub fn parent(path: string) -> string? {
+  let sep: usize? = last_separator(path);
+  if sep == null {
+    // No separator: a single relative component (e.g. "foo") has no parent.
+    return null;
+  }
+  if sep! == 0 {
+    // The only separator is the leading one.
+    if path.length() == 1 {
+      return null; // root "/"
+    }
+    return "/"; // "/a" -> "/"
+  }
+  return path.slice(0, sep!);
+}
+
+pub fn file_stem(path: string) -> string? {
+  let name: string? = file_name(path);
+  if name == null {
+    return null;
+  }
+  let dot: usize? = last_dot(name!);
+  if dot == null {
+    return name!;
+  }
+  // A leading dot is not an extension separator (".bashrc" -> ".bashrc").
+  if dot! == 0 {
+    return name!;
+  }
+  return name!.slice(0, dot!);
+}
+
+pub fn extension(path: string) -> string? {
+  let name: string? = file_name(path);
+  if name == null {
+    return null;
+  }
+  let dot: usize? = last_dot(name!);
+  if dot == null {
+    return null;
+  }
+  // A leading dot is not an extension separator.
+  if dot! == 0 {
+    return null;
+  }
+  return name!.slice(dot! + 1, name!.length());
+}
+
+pub fn components(path: string) -> string[] {
+  let mut result: string[] = [];
+  let len: usize = path.length();
+  if len == 0 {
+    return result;
+  }
+  // A leading "/" is preserved as an empty root-indicator component.
+  if path[0] == "/" {
+    result.push("");
+  }
+  let mut start: usize = 0;
+  let mut i: usize = 0;
+  while i < len {
+    if path[i] == "/" {
+      if i > start {
+        result.push(path.slice(start, i));
+      }
+      start = i + 1;
+    }
+    i += 1;
+  }
+  if len > start {
+    result.push(path.slice(start, len));
+  }
+  return result;
+}
+
+pub fn normalize(path: string) -> string {
+  let absolute: bool = is_absolute(path);
+  let mut stack: string[] = [];
+  for c in components(path) {
+    if c == "" {
+      // Root indicator from components(); the leading "/" is restored on rebuild.
+    } else if c == "." {
+      // Current-directory component drops out.
+    } else if c == ".." {
+      if stack.length() > 0 {
+        let top: string = stack[stack.length() - 1];
+        if top == ".." {
+          stack.push(".."); // already at a relative prefix; accumulate
+        } else {
+          stack.pop();
+        }
+      } else if !absolute {
+        stack.push(".."); // a relative path may keep leading ".."
+        // An absolute path drops ".." at the root.
+      }
+    } else {
+      stack.push(c);
+    }
+  }
+  let mut out: string = "";
+  if absolute {
+    out = "/";
+  }
+  let mut i: usize = 0;
+  while i < stack.length() {
+    if i > 0 {
+      out += "/";
+    }
+    out += stack[i];
+    i += 1;
+  }
+  if out == "" {
+    return "."; // an empty relative result normalizes to the current directory
+  }
+  return out;
+}
