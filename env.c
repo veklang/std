@@ -59,12 +59,8 @@ size_t __vek_env_argc(void) { return (size_t)(__vek_argc < 0 ? 0 : __vek_argc); 
 const char *__vek_env_arg(size_t index) { return __vek_argv[index]; }
 
 /* Environment snapshot. `environ` is a NULL-terminated "KEY=VALUE" array; the
- * Vek side asks for the count, then the key and value of each entry. The value
- * is a borrowed cstr (the tail after the first '='), copied to an owned string
- * on the Vek side. The key has no NUL at the '=' boundary, so it cannot be
- * returned as a plain cstr — env.c splits and copies it into an owned string
- * here via the length-bounded constructor. A malformed entry with no '=' (rare,
- * but permitted by POSIX) is a bare key with an empty value. */
+ * Vek side asks for the count, then the whole entry of each index as a borrowed
+ * cstr and splits it on the first '=' itself (find + slice). */
 size_t __vek_env_count(void) {
   size_t n = 0;
   if (environ != NULL)
@@ -73,18 +69,7 @@ size_t __vek_env_count(void) {
   return n;
 }
 
-__vek_string *__vek_env_pair_key(size_t index) {
-  const char *entry = environ[index];
-  const char *eq = strchr(entry, '=');
-  size_t key_len = eq != NULL ? (size_t)(eq - entry) : strlen(entry);
-  return __vek_string_from_literal(entry, key_len);
-}
-
-const char *__vek_env_pair_value(size_t index) {
-  const char *entry = environ[index];
-  const char *eq = strchr(entry, '=');
-  return eq != NULL ? eq + 1 : "";
-}
+const char *__vek_env_pair(size_t index) { return environ[index]; }
 
 /* Working directory change. Returns 0 on success or the errno on failure; the
  * Vek side turns a non-zero code into Err(strerror(code)). strerror returns a
