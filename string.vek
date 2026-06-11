@@ -160,6 +160,10 @@ builtin string {
     return count;
   }
 
+  // Half-open scalar slice `[start, end)`; backed by the runtime
+  // `__vek_string_slice`. Panics on `start > end` or `end > self.length()`.
+  pub fn slice(self, start: usize, end: usize) -> string;
+
   satisfies Length {
     fn length(self) -> usize;
   }
