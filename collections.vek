@@ -232,6 +232,25 @@ pub struct HashMap<K, V> {
       return self.count;
     }
   }
+
+  satisfies Default {
+    fn default() -> Self {
+      return HashMap { slots: [], count: 0, tombstones: 0 };
+    }
+  }
+
+  satisfies Index<K, V> where K: Hash + Equal<K> {
+    fn index_get(self, key: K) -> V {
+      match self.get(key) {
+        null => {
+          panic("HashMap: key not present");
+        }
+        v => {
+          return v!;
+        }
+      }
+    }
+  }
 }
 
 pub fn new<K, V>() -> HashMap<K, V> where K: Hash + Equal<K> {
@@ -397,6 +416,12 @@ pub struct HashSet<T> {
   satisfies Length {
     fn length(self) -> usize {
       return self.count;
+    }
+  }
+
+  satisfies Default {
+    fn default() -> Self {
+      return HashSet { slots: [], count: 0, tombstones: 0 };
     }
   }
 }
