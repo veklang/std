@@ -17,6 +17,22 @@ enum MapSlot<K, V> {
   Empty;
   Deleted;
   Occupied(K, V);
+
+  satisfies Clone where K: Clone, V: Clone {
+    fn clone(self) -> MapSlot<K, V> {
+      match self {
+        Empty => {
+          return Empty;
+        }
+        Deleted => {
+          return Deleted;
+        }
+        Occupied(k, v) => {
+          return Occupied(k.clone(), v.clone());
+        }
+      }
+    }
+  }
 }
 
 pub struct HashMap<K, V> {
@@ -251,6 +267,16 @@ pub struct HashMap<K, V> {
       }
     }
   }
+
+  satisfies Clone where K: Clone, V: Clone {
+    fn clone(self) -> Self {
+      return HashMap {
+        slots: self.slots.clone(),
+        count: self.count,
+        tombstones: self.tombstones,
+      };
+    }
+  }
 }
 
 pub fn new<K, V>() -> HashMap<K, V> where K: Hash + Equal<K> {
@@ -276,6 +302,22 @@ enum SetSlot<T> {
   Empty;
   Deleted;
   Occupied(T);
+
+  satisfies Clone where T: Clone {
+    fn clone(self) -> SetSlot<T> {
+      match self {
+        Empty => {
+          return Empty;
+        }
+        Deleted => {
+          return Deleted;
+        }
+        Occupied(item) => {
+          return Occupied(item.clone());
+        }
+      }
+    }
+  }
 }
 
 pub struct HashSet<T> {
@@ -422,6 +464,16 @@ pub struct HashSet<T> {
   satisfies Default {
     fn default() -> Self {
       return HashSet { slots: [], count: 0, tombstones: 0 };
+    }
+  }
+
+  satisfies Clone where T: Clone {
+    fn clone(self) -> Self {
+      return HashSet {
+        slots: self.slots.clone(),
+        count: self.count,
+        tombstones: self.tombstones,
+      };
     }
   }
 }
