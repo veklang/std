@@ -1,0 +1,129 @@
+// std:fmt — formatting helpers beyond the `Format` trait: padding/alignment,
+// alternate numeric bases, fixed/scientific float formatting, and joining.
+//
+// Everything operates on scalar (codepoint) widths, not byte or terminal widths
+// (see spec/std/fmt.md). All helpers allocate fresh `string` results and never
+// mutate their inputs. Only the float formatters need C backing (host printf);
+// the rest is pure Vek.
+
+extern "fmt.c";
+
+unsafe extern fn __vek_fmt_float(value: f64, precision: usize) -> string;
+unsafe extern fn __vek_fmt_float_exp(value: f64, precision: usize) -> string;
+
+// Lowercase digit alphabet, indexed by digit value. Hex uppercasing maps onto
+// the matching slice of this table's uppercase twin below.
+const DIGITS_LOWER: string = "0123456789abcdef";
+const DIGITS_UPPER: string = "0123456789ABCDEF";
+
+pub enum Align {
+  Left;
+  Right;
+  Center;
+}
+
+// Pads `s` to at least `width` scalar characters with `fill` (a single scalar)
+// and `align`. Returns `s` unchanged when it is already at least `width` wide.
+pub fn pad(s: string, width: usize, align: Align, fill: string) -> string {
+  if fill.length() != 1 {
+    panic("fmt.pad: fill must be a single scalar");
+  }
+  let len: usize = s.length();
+  if len >= width {
+    return s;
+  }
+  let total: usize = width - len;
+  match align {
+    Left => {
+      return s + repeat(fill, total);
+    }
+    Right => {
+      return repeat(fill, total) + s;
+    }
+    Center => {
+      // Extra fill (when `total` is odd) goes on the right.
+      let left: usize = total / 2;
+      let right: usize = total - left;
+      return repeat(fill, left) + s + repeat(fill, right);
+    }
+  }
+}
+
+pub inline fn pad_left(s: string, width: usize) -> string {
+  return pad(s, width, Right, " ");
+}
+
+pub inline fn pad_right(s: string, width: usize) -> string {
+  return pad(s, width, Left, " ");
+}
+
+// `count` copies of `unit` concatenated.
+fn repeat(unit: string, count: usize) -> string {
+  let mut out: string = "";
+  let mut i: usize = 0;
+  while i < count {
+    out += unit;
+    i += 1;
+  }
+  return out;
+}
+
+pub fn hex_u64(value: u64, uppercase: bool) -> string {
+  let digits: string = if uppercase { DIGITS_UPPER } else { DIGITS_LOWER };
+  return to_base(value, 16, digits);
+}
+
+pub fn hex_i64(value: i64, uppercase: bool) -> string {
+  // Two's-complement: reinterpret the bit pattern as unsigned. A plain
+  // `as u64` on a negative i64 wraps modulo 2^64, which is exactly the
+  // two's-complement encoding.
+  let digits: string = if uppercase { DIGITS_UPPER } else { DIGITS_LOWER };
+  return to_base(value as u64, 16, digits);
+}
+
+pub fn oct_u64(value: u64) -> string {
+  return to_base(value, 8, DIGITS_LOWER);
+}
+
+pub fn bin_u64(value: u64) -> string {
+  return to_base(value, 2, DIGITS_LOWER);
+}
+
+// `value` rendered in `base` (2..=16) using the `digits` alphabet, least
+// significant digit produced last. Always at least one digit ("0" for zero).
+fn to_base(value: u64, base: u64, digits: string) -> string {
+  if value == 0 {
+    return digits.slice(0, 1);
+  }
+  let mut out: string = "";
+  let mut v: u64 = value;
+  while v != 0 {
+    let d: usize = (v % base) as usize;
+    out = digits.slice(d, d + 1) + out;
+    v /= base;
+  }
+  return out;
+}
+
+pub fn float(value: f64, precision: usize) -> string {
+  return unsafe { __vek_fmt_float(value, precision) };
+}
+
+pub fn float_exp(value: f64, precision: usize) -> string {
+  return unsafe { __vek_fmt_float_exp(value, precision) };
+}
+
+// `values[0].format() + separator + values[1].format() + ...`; empty string for
+// an empty input.
+pub fn join<T: Format>(values: T[], separator: string) -> string {
+  let mut out: string = "";
+  let mut first: bool = true;
+  for value in values {
+    if !first {
+      out += separator;
+    }
+    out += value.format();
+    first = false;
+  }
+  return out;
+}
