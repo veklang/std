@@ -1,0 +1,164 @@
+// std:rand — seedable pseudorandom number generation. NOT cryptographic.
+//
+// The generator is PCG-XSH-RR 64/32 (Melissa O'Neill's PCG): a 64-bit LCG state
+// whose advance is `state = state * MULT + inc`, with a permuted 32-bit output.
+// All integer arithmetic here relies on Vek's defined wrapping overflow for
+// `+`/`-`/`*` (see Language Spec §02), which is exactly the modular arithmetic a
+// PCG/LCG needs.
+//
+// `from_seed` covers deterministic construction; `from_os` seeds from host
+// entropy through a tiny C backing (rand.c reads /dev/urandom). The generator
+// itself is pure Vek.
+
+extern "rand.c";
+
+// 8 bytes of OS entropy as a u64. Panics (in C) if the host entropy source is
+// unavailable. Two calls yield independent values.
+unsafe extern fn __vek_rand_os_u64() -> u64;
+
+// LCG multiplier (the PCG/“Knuth” 64-bit constant).
+const PCG_MULT: u64 = 6364136223846793005;
+
+pub struct Rng {
+  state: u64;
+  inc: u64;
+
+  // Advance and return the next 32-bit output (PCG-XSH-RR permutation of the
+  // pre-advance state).
+  pub fn next_u32(mut self) -> u32 {
+    let old: u64 = self.state;
+    self.state = old * PCG_MULT + self.inc;
+    let xorshifted: u32 = ((((old >> 18) ^ old) >> 27) as u32);
+    let rot: u32 = (old >> 59) as u32;
+    // Rotate-right by `rot` within 32 bits. `rot` is in 0..=31, so the
+    // complementary shift `(32 - rot) & 31` stays in 0..=31 (and is 0 when
+    // rot is 0, avoiding a full-width shift).
+    return (xorshifted >> rot) | (xorshifted << ((32 - rot) & 31));
+  }
+
+  // Two `next_u32` outputs concatenated, high word first.
+  pub fn next_u64(mut self) -> u64 {
+    let hi: u64 = self.next_u32() as u64;
+    let lo: u64 = self.next_u32() as u64;
+    return (hi << 32) | lo;
+  }
+
+  // A value in [0.0, 1.0) with 53 bits of mantissa entropy.
+  pub fn next_f64(mut self) -> f64 {
+    // Top 53 bits of a 64-bit draw, divided by 2^53.
+    let bits: u64 = self.next_u64() >> 11;
+    return (bits as f64) / 9007199254740992.0;
+  }
+
+  // `true` or `false` with equal probability.
+  pub fn next_bool(mut self) -> bool {
+    return (self.next_u32() & 1) == 1;
+  }
+
+  // Uniform integer in [0, bound) with no modulo bias, via Lemire's debiased
+  // multiplication. Caller guarantees bound > 0.
+  fn bounded_u32(mut self, bound: u32) -> u32 {
+    let bound64: u64 = bound as u64;
+    let mut product: u64 = (self.next_u32() as u64) * bound64;
+    let mut low: u64 = product & 0xFFFFFFFF;
+    if low < bound64 {
+      // Reject the low `2^32 % bound` products to debias. `2^32 % bound`
+      // equals `(2^32 - bound) % bound`, computed in u64 with no overflow.
+      let threshold: u64 = 0x100000000 % bound64;
+      while low < threshold {
+        product = (self.next_u32() as u64) * bound64;
+        low = product & 0xFFFFFFFF;
+      }
+    }
+    return (product >> 32) as u32;
+  }
+
+  // Uniform integer in [lo, hi). Panics if lo >= hi.
+  pub fn range_u32(mut self, lo: u32, hi: u32) -> u32 {
+    if lo >= hi {
+      panic("rand.range_u32: lo must be < hi");
+    }
+    return lo + self.bounded_u32(hi - lo);
+  }
+
+  // Uniform integer in [lo, hi). Panics if lo >= hi.
+  pub fn range_i32(mut self, lo: i32, hi: i32) -> i32 {
+    if lo >= hi {
+      panic("rand.range_i32: lo must be < hi");
+    }
+    // Compute the width in 64 bits so the full i32 span (e.g. i32 min..max)
+    // does not overflow, then add the unsigned offset back onto lo.
+    let width: u32 = ((hi as i64) - (lo as i64)) as u32;
+    let offset: u32 = self.bounded_u32(width);
+    return ((lo as i64) + (offset as i64)) as i32;
+  }
+
+  // Uniform float in [lo, hi). Panics if lo >= hi or either endpoint is NaN.
+  pub fn range_f64(mut self, lo: f64, hi: f64) -> f64 {
+    // NaN compares false to everything, so test it explicitly (x != x is true
+    // only for NaN). With a NaN endpoint `lo >= hi` would be false otherwise.
+    if lo != lo || hi != hi {
+      panic("rand.range_f64: endpoints must not be NaN");
+    }
+    if lo >= hi {
+      panic("rand.range_f64: lo must be < hi");
+    }
+    return lo + self.next_f64() * (hi - lo);
+  }
+
+  // Fisher-Yates shuffle of `xs` in place.
+  pub fn shuffle<T>(mut self, mut xs: T[]) -> void {
+    let n: usize = xs.length();
+    if n <= 1 {
+      return;
+    }
+    let mut i: usize = n - 1;
+    while i > 0 {
+      // j uniform in [0, i]; swap xs[i] and xs[j].
+      let j: usize = self.bounded_u32((i + 1) as u32) as usize;
+      let tmp = xs[i];
+      xs[i] = xs[j];
+      xs[j] = tmp;
+      i -= 1;
+    }
+  }
+}
+
+// SplitMix64: a fast mixing function used to expand a single user seed into the
+// generator's full (state, inc) without correlated low bits.
+fn splitmix64(seed: u64) -> u64 {
+  let mut z: u64 = seed + 0x9E3779B97F4A7C15;
+  z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9;
+  z = (z ^ (z >> 27)) * 0x94D049BB133111EB;
+  return z ^ (z >> 31);
+}
+
+// Build a generator from a raw initial state and stream selector. Canonical PCG
+// seeding, unrolled: `inc` is forced odd (full LCG period), then state starts at
+// 0, steps once, folds in the initial state, and steps once more.
+fn seed_rng(initstate: u64, seq: u64) -> Rng {
+  let inc: u64 = (seq << 1) | 1;
+  let mut state: u64 = inc;
+  state += initstate;
+  state = state * PCG_MULT + inc;
+  return Rng { state: state, inc: inc };
+}
+
+// Seed a generator deterministically from `seed`. Two calls with the same seed
+// produce identical generators (and thus identical sequences). SplitMix64
+// expands the single seed into an initial state and stream without correlated
+// low bits.
+pub fn from_seed(seed: u64) -> Rng {
+  let initstate: u64 = splitmix64(seed);
+  let seq: u64 = splitmix64(initstate);
+  return seed_rng(initstate, seq);
+}
+
+// Seed a generator from host OS entropy (/dev/urandom). Two consecutive calls
+// produce independent generators. Panics if the host entropy source is
+// unavailable.
+pub fn from_os() -> Rng {
+  let initstate: u64 = unsafe { __vek_rand_os_u64() };
+  let seq: u64 = unsafe { __vek_rand_os_u64() };
+  return seed_rng(initstate, seq);
+}
