@@ -1,6 +1,7 @@
 builtin string {
   pub fn to_cstr(self) -> cstr;
   pub unsafe fn from_cstr(source: cstr) -> string;
+  pub unsafe fn adopt_cstr(source: cstr) -> string;
 
   pub inline fn is_empty(self) -> bool {
     return self.length() == 0;
