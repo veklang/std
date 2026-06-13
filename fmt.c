@@ -26,13 +26,14 @@ static char *dup_cstr(const char *s) {
 
 /* snprintf into an exactly-sized malloc'd buffer and return it for the caller to
  * own. `spec` is "%.*f" (fixed) or "%.*e" (scientific). Non-finite values format
- * as "NaN" / "inf" / "-inf" per spec, independent of the host libc's printf
- * spelling (glibc would print "nan", "inf"). Returns NULL on failure. */
+ * as "NaN" / "Infinity" / "-Infinity" per spec — matching Vek's float literal
+ * keywords and the default Format output, not the host libc's "nan"/"inf".
+ * Returns NULL on failure. */
 static char *fmt_with(const char *spec, double value, size_t precision) {
   if (isnan(value))
     return dup_cstr("NaN");
   if (isinf(value))
-    return dup_cstr(value < 0.0 ? "-inf" : "inf");
+    return dup_cstr(value < 0.0 ? "-Infinity" : "Infinity");
 
   int prec = precision > (size_t)INT_MAX ? INT_MAX : (int)precision;
   int needed = snprintf(NULL, 0, spec, prec, value);
