@@ -1,25 +1,25 @@
-unsafe extern fn __vek_math_sqrt(x: f64) -> f64;
-unsafe extern fn __vek_math_cbrt(x: f64) -> f64;
-unsafe extern fn __vek_math_fabs(x: f64) -> f64;
-unsafe extern fn __vek_math_floor(x: f64) -> f64;
-unsafe extern fn __vek_math_ceil(x: f64) -> f64;
-unsafe extern fn __vek_math_trunc(x: f64) -> f64;
-unsafe extern fn __vek_math_round(x: f64) -> f64;
-unsafe extern fn __vek_math_exp(x: f64) -> f64;
-unsafe extern fn __vek_math_exp2(x: f64) -> f64;
-unsafe extern fn __vek_math_log(x: f64) -> f64;
-unsafe extern fn __vek_math_log2(x: f64) -> f64;
-unsafe extern fn __vek_math_log10(x: f64) -> f64;
-unsafe extern fn __vek_math_sin(x: f64) -> f64;
-unsafe extern fn __vek_math_cos(x: f64) -> f64;
-unsafe extern fn __vek_math_tan(x: f64) -> f64;
-unsafe extern fn __vek_math_asin(x: f64) -> f64;
-unsafe extern fn __vek_math_acos(x: f64) -> f64;
-unsafe extern fn __vek_math_atan(x: f64) -> f64;
-unsafe extern fn __vek_math_atan2(y: f64, x: f64) -> f64;
-unsafe extern fn __vek_math_is_nan(x: f64) -> bool;
-unsafe extern fn __vek_math_is_finite(x: f64) -> bool;
-unsafe extern fn __vek_math_is_infinite(x: f64) -> bool;
+native fn __rt_math_sqrt(x: f64) -> f64;
+native fn __rt_math_cbrt(x: f64) -> f64;
+native fn __rt_math_fabs(x: f64) -> f64;
+native fn __rt_math_floor(x: f64) -> f64;
+native fn __rt_math_ceil(x: f64) -> f64;
+native fn __rt_math_trunc(x: f64) -> f64;
+native fn __rt_math_round(x: f64) -> f64;
+native fn __rt_math_exp(x: f64) -> f64;
+native fn __rt_math_exp2(x: f64) -> f64;
+native fn __rt_math_log(x: f64) -> f64;
+native fn __rt_math_log2(x: f64) -> f64;
+native fn __rt_math_log10(x: f64) -> f64;
+native fn __rt_math_sin(x: f64) -> f64;
+native fn __rt_math_cos(x: f64) -> f64;
+native fn __rt_math_tan(x: f64) -> f64;
+native fn __rt_math_asin(x: f64) -> f64;
+native fn __rt_math_acos(x: f64) -> f64;
+native fn __rt_math_atan(x: f64) -> f64;
+native fn __rt_math_atan2(y: f64, x: f64) -> f64;
+native fn __rt_math_is_nan(x: f64) -> bool;
+native fn __rt_math_is_finite(x: f64) -> bool;
+native fn __rt_math_is_infinite(x: f64) -> bool;
 
 pub const PI: f64 = 3.141592653589793;
 pub const TAU: f64 = 6.283185307179586;
@@ -52,25 +52,25 @@ pub inline fn clamp<T: Order<T>>(x: T, lo: T, hi: T) -> T {
   return x;
 }
 
-pub inline fn abs(x: f64) -> f64 { return unsafe { __vek_math_fabs(x) }; }
-pub inline fn sqrt(x: f64) -> f64 { return unsafe { __vek_math_sqrt(x) }; }
-pub inline fn cbrt(x: f64) -> f64 { return unsafe { __vek_math_cbrt(x) }; }
-pub inline fn floor(x: f64) -> f64 { return unsafe { __vek_math_floor(x) }; }
-pub inline fn ceil(x: f64) -> f64 { return unsafe { __vek_math_ceil(x) }; }
-pub inline fn trunc(x: f64) -> f64 { return unsafe { __vek_math_trunc(x) }; }
-pub inline fn round(x: f64) -> f64 { return unsafe { __vek_math_round(x) }; }
-pub inline fn exp(x: f64) -> f64 { return unsafe { __vek_math_exp(x) }; }
-pub inline fn exp2(x: f64) -> f64 { return unsafe { __vek_math_exp2(x) }; }
-pub inline fn log(x: f64) -> f64 { return unsafe { __vek_math_log(x) }; }
-pub inline fn log2(x: f64) -> f64 { return unsafe { __vek_math_log2(x) }; }
-pub inline fn log10(x: f64) -> f64 { return unsafe { __vek_math_log10(x) }; }
-pub inline fn sin(x: f64) -> f64 { return unsafe { __vek_math_sin(x) }; }
-pub inline fn cos(x: f64) -> f64 { return unsafe { __vek_math_cos(x) }; }
-pub inline fn tan(x: f64) -> f64 { return unsafe { __vek_math_tan(x) }; }
-pub inline fn asin(x: f64) -> f64 { return unsafe { __vek_math_asin(x) }; }
-pub inline fn acos(x: f64) -> f64 { return unsafe { __vek_math_acos(x) }; }
-pub inline fn atan(x: f64) -> f64 { return unsafe { __vek_math_atan(x) }; }
-pub inline fn atan2(y: f64, x: f64) -> f64 { return unsafe { __vek_math_atan2(y, x) }; }
-pub inline fn is_nan(x: f64) -> bool { return unsafe { __vek_math_is_nan(x) }; }
-pub inline fn is_finite(x: f64) -> bool { return unsafe { __vek_math_is_finite(x) }; }
-pub inline fn is_infinite(x: f64) -> bool { return unsafe { __vek_math_is_infinite(x) }; }
+pub inline fn abs(x: f64) -> f64 { return  __rt_math_fabs(x) ; }
+pub inline fn sqrt(x: f64) -> f64 { return  __rt_math_sqrt(x) ; }
+pub inline fn cbrt(x: f64) -> f64 { return  __rt_math_cbrt(x) ; }
+pub inline fn floor(x: f64) -> f64 { return  __rt_math_floor(x) ; }
+pub inline fn ceil(x: f64) -> f64 { return  __rt_math_ceil(x) ; }
+pub inline fn trunc(x: f64) -> f64 { return  __rt_math_trunc(x) ; }
+pub inline fn round(x: f64) -> f64 { return  __rt_math_round(x) ; }
+pub inline fn exp(x: f64) -> f64 { return  __rt_math_exp(x) ; }
+pub inline fn exp2(x: f64) -> f64 { return  __rt_math_exp2(x) ; }
+pub inline fn log(x: f64) -> f64 { return  __rt_math_log(x) ; }
+pub inline fn log2(x: f64) -> f64 { return  __rt_math_log2(x) ; }
+pub inline fn log10(x: f64) -> f64 { return  __rt_math_log10(x) ; }
+pub inline fn sin(x: f64) -> f64 { return  __rt_math_sin(x) ; }
+pub inline fn cos(x: f64) -> f64 { return  __rt_math_cos(x) ; }
+pub inline fn tan(x: f64) -> f64 { return  __rt_math_tan(x) ; }
+pub inline fn asin(x: f64) -> f64 { return  __rt_math_asin(x) ; }
+pub inline fn acos(x: f64) -> f64 { return  __rt_math_acos(x) ; }
+pub inline fn atan(x: f64) -> f64 { return  __rt_math_atan(x) ; }
+pub inline fn atan2(y: f64, x: f64) -> f64 { return  __rt_math_atan2(y, x) ; }
+pub inline fn is_nan(x: f64) -> bool { return  __rt_math_is_nan(x) ; }
+pub inline fn is_finite(x: f64) -> bool { return  __rt_math_is_finite(x) ; }
+pub inline fn is_infinite(x: f64) -> bool { return  __rt_math_is_infinite(x) ; }

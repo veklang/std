@@ -1,30 +1,22 @@
-extern "io.c";
-
-unsafe extern fn __vek_io_write_stdout_cstr(message: cstr) -> void;
-unsafe extern fn __vek_io_write_stderr_cstr(message: cstr) -> void;
+// Native runtime builtins (resolve to runtime/src/builtins.c by symbol name;
+// the bytecode backend lowers these to `callb`). They take `string` directly —
+// the runtime reads the UTF-8 bytes. `println` prints a trailing newline itself.
+native fn __rt_io_print(message: string) -> void;
+native fn __rt_io_println(message: string) -> void;
+native fn __rt_io_eprint(message: string) -> void;
 
 pub inline fn print(message: string) -> void {
-  unsafe {
-    __vek_io_write_stdout_cstr(message.to_cstr());
-  }
+  __rt_io_print(message);
 }
 
 pub inline fn println(message: string) -> void {
-  unsafe {
-    __vek_io_write_stdout_cstr(message.to_cstr());
-    __vek_io_write_stdout_cstr("\n".to_cstr());
-  }
+  __rt_io_println(message);
 }
 
 pub inline fn eprint(message: string) -> void {
-  unsafe {
-    __vek_io_write_stderr_cstr(message.to_cstr());
-  }
+  __rt_io_eprint(message);
 }
 
 pub inline fn eprintln(message: string) -> void {
-  unsafe {
-    __vek_io_write_stderr_cstr(message.to_cstr());
-    __vek_io_write_stderr_cstr("\n".to_cstr());
-  }
+  __rt_io_eprint(message + "\n");
 }

@@ -1,7 +1,7 @@
 builtin string {
   pub fn to_cstr(self) -> cstr;
-  pub unsafe fn from_cstr(source: cstr) -> string;
-  pub unsafe fn adopt_cstr(source: cstr) -> string;
+  pub fn from_cstr(source: cstr) -> string;
+  pub fn adopt_cstr(source: cstr) -> string;
 
   pub inline fn is_empty(self) -> bool {
     return self.length() == 0;
@@ -162,7 +162,7 @@ builtin string {
   }
 
   // Half-open scalar slice `[start, end)`; backed by the runtime
-  // `__vek_string_slice`. Panics on `start > end` or `end > self.length()`.
+  // `__rt_string_slice`. Panics on `start > end` or `end > self.length()`.
   pub fn slice(self, start: usize, end: usize) -> string;
 
   satisfies Length {

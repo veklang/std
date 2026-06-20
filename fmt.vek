@@ -6,13 +6,12 @@
 // mutate their inputs. Only the float formatters need C backing (host printf);
 // the rest is pure Vek.
 
-extern "fmt.c";
 
 // The C side returns a freshly malloc'd, caller-owned cstr; `float`/`float_exp`
 // adopt it into a string (no copy, freed on drop). Returning a plain cstr keeps
 // the C signatures within the ordinary function-only ABI.
-unsafe extern fn __vek_fmt_float(value: f64, precision: usize) -> cstr;
-unsafe extern fn __vek_fmt_float_exp(value: f64, precision: usize) -> cstr;
+native fn __rt_fmt_float(value: f64, precision: usize) -> cstr;
+native fn __rt_fmt_float_exp(value: f64, precision: usize) -> cstr;
 
 // Lowercase digit alphabet, indexed by digit value. Hex uppercasing maps onto
 // the matching slice of this table's uppercase twin below.
@@ -109,11 +108,11 @@ fn to_base(value: u64, base: u64, digits: string) -> string {
 }
 
 pub fn float(value: f64, precision: usize) -> string {
-  return unsafe { string.adopt_cstr(__vek_fmt_float(value, precision)) };
+  return string.adopt_cstr(__rt_fmt_float(value, precision)) ;
 }
 
 pub fn float_exp(value: f64, precision: usize) -> string {
-  return unsafe { string.adopt_cstr(__vek_fmt_float_exp(value, precision)) };
+  return string.adopt_cstr(__rt_fmt_float_exp(value, precision)) ;
 }
 
 // `values[0].format() + separator + values[1].format() + ...`; empty string for

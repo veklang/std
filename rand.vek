@@ -10,11 +10,9 @@
 // entropy through a tiny C backing (rand.c reads /dev/urandom). The generator
 // itself is pure Vek.
 
-extern "rand.c";
-
 // 8 bytes of OS entropy as a u64. Panics (in C) if the host entropy source is
 // unavailable. Two calls yield independent values.
-unsafe extern fn __vek_rand_os_u64() -> u64;
+native fn __rt_rand_os_u64() -> u64;
 
 // LCG multiplier (the PCG/“Knuth” 64-bit constant).
 const PCG_MULT: u64 = 6364136223846793005;
@@ -158,7 +156,7 @@ pub fn from_seed(seed: u64) -> Rng {
 // produce independent generators. Panics if the host entropy source is
 // unavailable.
 pub fn from_os() -> Rng {
-  let initstate: u64 = unsafe { __vek_rand_os_u64() };
-  let seq: u64 = unsafe { __vek_rand_os_u64() };
+  let initstate: u64 =  __rt_rand_os_u64() ;
+  let seq: u64 =  __rt_rand_os_u64() ;
   return seed_rng(initstate, seq);
 }
