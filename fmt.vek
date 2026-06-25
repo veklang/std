@@ -7,11 +7,11 @@
 // the rest is pure Vek.
 
 
-// The C side returns a freshly malloc'd, caller-owned cstr; `float`/`float_exp`
-// adopt it into a string (no copy, freed on drop). Returning a plain cstr keeps
-// the C signatures within the ordinary function-only ABI.
-native fn __rt_fmt_float(value: f64, precision: usize) -> cstr;
-native fn __rt_fmt_float_exp(value: f64, precision: usize) -> cstr;
+// The runtime builds a fresh owned `string` directly (host printf into a
+// buffer, then a string copy), so `float`/`float_exp` just return it. NaN/±∞
+// render as "NaN"/"Infinity"/"-Infinity" (the spec spellings).
+native fn __rt_fmt_float(value: f64, precision: usize) -> string;
+native fn __rt_fmt_float_exp(value: f64, precision: usize) -> string;
 
 // Lowercase digit alphabet, indexed by digit value. Hex uppercasing maps onto
 // the matching slice of this table's uppercase twin below.
@@ -108,11 +108,11 @@ fn to_base(value: u64, base: u64, digits: string) -> string {
 }
 
 pub fn float(value: f64, precision: usize) -> string {
-  return string.adopt_cstr(__rt_fmt_float(value, precision)) ;
+  return __rt_fmt_float(value, precision);
 }
 
 pub fn float_exp(value: f64, precision: usize) -> string {
-  return string.adopt_cstr(__rt_fmt_float_exp(value, precision)) ;
+  return __rt_fmt_float_exp(value, precision);
 }
 
 // `values[0].format() + separator + values[1].format() + ...`; empty string for
