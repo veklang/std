@@ -106,14 +106,14 @@ pub struct Rng {
 
   // Fisher-Yates shuffle of `xs` in place.
   pub fn shuffle<T>(mut self, mut xs: T[]) -> void {
-    let n: usize = xs.length();
+    let n: int = xs.length();
     if n <= 1 {
       return;
     }
-    let mut i: usize = n - 1;
+    let mut i: int = n - 1;
     while i > 0 {
       // j uniform in [0, i]; swap xs[i] and xs[j].
-      let j: usize = self.bounded_u32((i + 1) as u32) as usize;
+      let j: int = self.bounded_u32((i + 1) as u32) as int;
       let tmp = xs[i];
       xs[i] = xs[j];
       xs[j] = tmp;

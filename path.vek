@@ -7,10 +7,10 @@
 // when a Windows target exists.
 
 // Scalar position of the last `/` in `s`, or null when there is none.
-fn last_separator(s: string) -> usize? {
-  let len: usize = s.length();
-  let mut found: usize? = null;
-  let mut i: usize = 0;
+fn last_separator(s: string) -> int? {
+  let len: int = s.length();
+  let mut found: int? = null;
+  let mut i: int = 0;
   while i < len {
     if s[i] == "/" {
       found = i;
@@ -21,10 +21,10 @@ fn last_separator(s: string) -> usize? {
 }
 
 // Scalar position of the last `.` in `s`, or null when there is none.
-fn last_dot(s: string) -> usize? {
-  let len: usize = s.length();
-  let mut found: usize? = null;
-  let mut i: usize = 0;
+fn last_dot(s: string) -> int? {
+  let len: int = s.length();
+  let mut found: int? = null;
+  let mut i: int = 0;
   while i < len {
     if s[i] == "." {
       found = i;
@@ -61,7 +61,7 @@ pub fn join(base: string, relative: string) -> string {
 }
 
 pub fn file_name(path: string) -> string? {
-  let len: usize = path.length();
+  let len: int = path.length();
   if len == 0 {
     return null;
   }
@@ -69,7 +69,7 @@ pub fn file_name(path: string) -> string? {
   if path[len - 1] == "/" {
     return null;
   }
-  let sep: usize? = last_separator(path);
+  let sep: int? = last_separator(path);
   if sep == null {
     return path;
   }
@@ -77,7 +77,7 @@ pub fn file_name(path: string) -> string? {
 }
 
 pub fn parent(path: string) -> string? {
-  let sep: usize? = last_separator(path);
+  let sep: int? = last_separator(path);
   if sep == null {
     // No separator: a single relative component (e.g. "foo") has no parent.
     return null;
@@ -97,7 +97,7 @@ pub fn file_stem(path: string) -> string? {
   if name == null {
     return null;
   }
-  let dot: usize? = last_dot(name!);
+  let dot: int? = last_dot(name!);
   if dot == null {
     return name!;
   }
@@ -113,7 +113,7 @@ pub fn extension(path: string) -> string? {
   if name == null {
     return null;
   }
-  let dot: usize? = last_dot(name!);
+  let dot: int? = last_dot(name!);
   if dot == null {
     return null;
   }
@@ -126,7 +126,7 @@ pub fn extension(path: string) -> string? {
 
 pub fn components(path: string) -> string[] {
   let mut result: string[] = [];
-  let len: usize = path.length();
+  let len: int = path.length();
   if len == 0 {
     return result;
   }
@@ -134,8 +134,8 @@ pub fn components(path: string) -> string[] {
   if path[0] == "/" {
     result.push("");
   }
-  let mut start: usize = 0;
-  let mut i: usize = 0;
+  let mut start: int = 0;
+  let mut i: int = 0;
   while i < len {
     if path[i] == "/" {
       if i > start {
@@ -179,7 +179,7 @@ pub fn normalize(path: string) -> string {
   if absolute {
     out = "/";
   }
-  let mut i: usize = 0;
+  let mut i: int = 0;
   while i < stack.length() {
     if i > 0 {
       out += "/";

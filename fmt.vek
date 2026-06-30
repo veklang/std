@@ -26,15 +26,15 @@ pub enum Align {
 
 // Pads `s` to at least `width` scalar characters with `fill` (a single scalar)
 // and `align`. Returns `s` unchanged when it is already at least `width` wide.
-pub fn pad(s: string, width: usize, align: Align, fill: string) -> string {
+pub fn pad(s: string, width: int, align: Align, fill: string) -> string {
   if fill.length() != 1 {
     panic("fmt.pad: fill must be a single scalar");
   }
-  let len: usize = s.length();
+  let len: int = s.length();
   if len >= width {
     return s;
   }
-  let total: usize = width - len;
+  let total: int = width - len;
   match align {
     Left => {
       return s + repeat(fill, total);
@@ -44,25 +44,25 @@ pub fn pad(s: string, width: usize, align: Align, fill: string) -> string {
     }
     Center => {
       // Extra fill (when `total` is odd) goes on the right.
-      let left: usize = total / 2;
-      let right: usize = total - left;
+      let left: int = total / 2;
+      let right: int = total - left;
       return repeat(fill, left) + s + repeat(fill, right);
     }
   }
 }
 
-pub inline fn pad_left(s: string, width: usize) -> string {
+pub inline fn pad_left(s: string, width: int) -> string {
   return pad(s, width, Right, " ");
 }
 
-pub inline fn pad_right(s: string, width: usize) -> string {
+pub inline fn pad_right(s: string, width: int) -> string {
   return pad(s, width, Left, " ");
 }
 
 // `count` copies of `unit` concatenated.
-fn repeat(unit: string, count: usize) -> string {
+fn repeat(unit: string, count: int) -> string {
   let mut out: string = "";
-  let mut i: usize = 0;
+  let mut i: int = 0;
   while i < count {
     out += unit;
     i += 1;
@@ -100,19 +100,19 @@ fn to_base(value: u64, base: u64, digits: string) -> string {
   let mut out: string = "";
   let mut v: u64 = value;
   while v != 0 {
-    let d: usize = (v % base) as usize;
+    let d: int = (v % base) as int;
     out = digits.slice(d, d + 1) + out;
     v /= base;
   }
   return out;
 }
 
-pub fn float(value: f64, precision: usize) -> string {
-  return __rt_fmt_float(value, precision);
+pub fn float(value: f64, precision: int) -> string {
+  return __rt_fmt_float(value, precision as usize);
 }
 
-pub fn float_exp(value: f64, precision: usize) -> string {
-  return __rt_fmt_float_exp(value, precision);
+pub fn float_exp(value: f64, precision: int) -> string {
+  return __rt_fmt_float_exp(value, precision as usize);
 }
 
 // `values[0].format() + separator + values[1].format() + ...`; empty string for
