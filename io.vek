@@ -4,6 +4,7 @@
 native fn __rt_io_print(message: string) -> void;
 native fn __rt_io_println(message: string) -> void;
 native fn __rt_io_eprint(message: string) -> void;
+native fn __rt_io_eprintln(message: string) -> void;
 
 pub inline fn print(message: string) -> void {
   __rt_io_print(message);
@@ -18,5 +19,5 @@ pub inline fn eprint(message: string) -> void {
 }
 
 pub inline fn eprintln(message: string) -> void {
-  __rt_io_eprint(message + "\n");
+  __rt_io_eprintln(message);
 }
